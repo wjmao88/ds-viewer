@@ -4,25 +4,26 @@ var StructureBinder = function(name, ClassFunction, stepSize){
   this.stepSize = stepSize === undefined? 1000 : stepSize;
   this.name = name;
   this.ClassFunction = ClassFunction;
+  this.exportProperties = [];
 };
 
 //decorate a selected function with a breakpoint.
 //will look by function name in the class prototype
 //
-//befire the execution of the original function, timeout
+//before the execution of the original function, timeout
 //for the stepSize amount of time
 //can be skipped by an event from specified dom element
 //
 StructureBinder.prototype.defBreakPoint = function(funcName){
   var func = this.ClassFunction.prototype[funcName];
-  return function(){
+  this.ClassFunction.prototype[funcName] = function(){
     var context = this;
-    var ti = setTimeout(function(){
+    var time = setTimeout(function(){
       func.apply(context, arguments);
     }, this.stepSize);
 
     $('.structure-binder-ignore-timeout').on('click', function(){
-      window.clearTimeout(ti);
+      window.clearTimeout(time);
       func.apply(context, arguments);
     });
   };
@@ -58,17 +59,39 @@ StructureBinder.prototype.bindRemove = function(funcName){
 //
 //if both contain more than one, it is considered graph like
 //
-StructureBinder.prototype.defRelation = function(structureName, property){
-  this.undirectedLink = this.undirectedLink || [];
-  this.undirectedLink.push(property);
+StructureBinder.prototype.defRelation = function(property){
+  this.undirectedLinks = this.undirectedLink || [];
+  this.undirectedLinks.push(property);
 };
 
-StructureBinder.prototype.defRelationPrev = function(structureName, property){
-  this.previousLink = this.previousLink || [];
-  this.previousLink.push(property);
+StructureBinder.prototype.defRelationPrev = function(property){
+  this.previousLinks = this.previousLink || [];
+  this.previousLinks.push(property);
 };
 
-StructureBinder.prototype.defRelationNext = function(structureName, property){
-  this.nextLink = this.nextLink || [];
-  this.nextLink = property;
+StructureBinder.prototype.defRelationNext = function(property){
+  this.nextLinks = this.nextLink || [];
+  this.nextLinks.push(property);
+};
+
+//
+StructureBinder.prototype.render = function(instance, $parentNode){
+  var $node = $('<div class="node"></div>');
+  this.$node = $parentNode === undefined? $node : this.$node;
+  for (var i=0; i< this.exportProperties.length; i++){
+    $node.append('<div class="property">' + this.exportProperties[i] + ' : ' + instance[this.exportProperties[i]] + '</div>');
+  }
+  //recursively render the next links if they exist
+  //put them in children for rendering links
+  var children = [];
+  if (this.nextLinks !== undefined){
+    for (var i=0; i< this.nextLinks.length; i++){
+      if (instance[this.nextLinks[i]] !== undefined){
+        children.push(this.render(instance[this.nextLinks[i]]));
+      }
+    }
+  }
+  //rendering links
+
+  return $node;
 };
