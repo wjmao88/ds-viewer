@@ -1,4 +1,4 @@
-var RBtree = function(value, parent){
+var RedBlackTree = function(value, parent){
   //console.log('make red black tree ' + value + ' | '+ parent);
   BinarySearchTree.apply(this, arguments);
   this.value = value;
@@ -9,35 +9,35 @@ var RBtree = function(value, parent){
 };
 
 (function(){
-  RBtree.prototype = Object.create(BinarySearchTree.prototype);
-  RBtree.prototype.contructor = RBtree;
+  RedBlackTree.prototype = Object.create(BinarySearchTree.prototype);
+  RedBlackTree.prototype.contructor = RedBlackTree;
 }());
 
-RBtree.isBlack = function(node){
+RedBlackTree.isBlack = function(node){
   return (node === null || node.color === 'black');
 };
 
-RBtree.isRed = function(node){
+RedBlackTree.isRed = function(node){
   return node !== null && node.color === 'red';
 };
 
-RBtree.prototype.factory = function(value, parent){
-  return new RBtree(value, parent);
+RedBlackTree.prototype.factory = function(value, parent){
+  return new RedBlackTree(value, parent);
 };
 //=========================================================
-RBtree.prototype.blackDepth = function(){
+RedBlackTree.prototype.blackDepth = function(){
   var depth = this.color === 'black'? 1: 0;
   return depth + (this.left === null? 1 : this.left.blackDepth());
 };
 
-RBtree.prototype.hasRedViolation = function(){
-  var violation = RBtree.isRed(this) && (RBtree.isRed(this.left) || RBtree.isRed(this.right));
+RedBlackTree.prototype.hasRedViolation = function(){
+  var violation = RedBlackTree.isRed(this) && (RedBlackTree.isRed(this.left) || RedBlackTree.isRed(this.right));
   violation = violation || (this.left !== null && this.left.hasRedViolation());
   violation = violation || (this.right !== null && this.right.hasRedViolation());
   return violation;
 };
 
-RBtree.prototype.hasBlackViolation = function(){
+RedBlackTree.prototype.hasBlackViolation = function(){
   var left = this.left === null? 1 : this.left.blackDepth();
   var right = this.right === null? 1 : this.right.blackDepth();
   var leftResult = this.left === null? false : this.left.hasBlackViolation();
@@ -45,22 +45,36 @@ RBtree.prototype.hasBlackViolation = function(){
   return left !== right || leftResult || rightResult;
 };
 //=========================================================
-RBtree.prototype.toJSON = function(){
+RedBlackTree.nullCounter = 0;
+RedBlackTree.prototype.toJSON = function(){
   var map = {
-    content: this.value + ' | ' + this.color + ' | ' + (this.parent === null? 'is root' : this.parent.value)
+    id: '',
+    value: this.value,
+    color: this.color,
+    parent: this.parent === null? null : this.parent.value
   };
-  map.left = this.left === null ? null : this.left.toJSON();
-  map.right = this.right === null? null : this.right.toJSON();
+  map.children = [];
+  map.children.push(this.left === null ? this.nullJSON(map) : this.left.toJSON());
+  map.children.push(this.right === null ? this.nullJSON(map) : this.right.toJSON());
   return map;
 };
 
-RBtree.prototype.toString = function(){
+RedBlackTree.prototype.nullJSON = function(parent){
+  return {
+    value: 'nl',
+    id: RedBlackTree.nullCounter++,
+    color: 'black',
+    children: [],
+    parent: parent
+  };
+};
+
+RedBlackTree.prototype.toString = function(){
   return JSON.stringify(this.toJSON(), null, 2);
 };
 //=========================================================
-RBtree.prototype.removeSelf = function(){
+RedBlackTree.prototype.removeSelf = function(){
   var doubleBlack = BinarySearchTree.prototype.removeSelf.call(this);
-  console.log('deleting ' + doubleBlack.value);
   if (doubleBlack.parent === null){
     //delete root?
     return;
@@ -69,37 +83,58 @@ RBtree.prototype.removeSelf = function(){
     //removing a red need no changes
     return;
   }
+  treeBreak('removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
   doubleBlack.propagateUp(doubleBlack.sibling());
+  treeBreak('end removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
 };
 
-RBtree.prototype.propagateUp = function(sibling){
+RedBlackTree.prototype.propagateUp = function(sibling){
   if (this.parent !== null){
     this.parent.propagate(sibling || this.sibling());
   }
 };
 
-RBtree.prototype.propagate = function(sibling){
+RedBlackTree.prototype.propagate = function(sibling){
   //sibling is referring to the sibling of the double black node
   //case 1
+  treeBreak('propagated ' + sibling.value, this.value, 2);
   if (this.color === 'black' && sibling.color === 'red'){
     this.case1(sibling);
-  } else if (sibling.color === 'black' && RBtree.isBlack(sibling.left) && RBtree.isBlack(sibling.right)){
+  } else if (sibling.color === 'black' && RedBlackTree.isBlack(sibling.left) && RedBlackTree.isBlack(sibling.right)){
     this.case2(sibling);
-  } else if (sibling.color === 'black' && RBtree.isRed(sibling[sibling.otherSide()]) && RBtree.isBlack(sibling[sibling.side()]) ){
+  } else if (sibling.color === 'black' && RedBlackTree.isRed(sibling[sibling.otherSide()]) && RedBlackTree.isBlack(sibling[sibling.side()]) ){
     this.case3(sibling);
-  } else if (sibling.color === 'black' && RBtree.isRed(sibling[sibling.side()])){
+  } else if (sibling.color === 'black' && RedBlackTree.isRed(sibling[sibling.side()])){
     this.case4(sibling);
+  }
+  if (this.color === 'red'){
+    console.log('unhandled case ', this.value, sibling.value);
   }
 };
 
-RBtree.prototype.case1 = function(sibling){
+RedBlackTree.prototype.case1 = function(sibling){
+  treeBreak('case 1 ', sibling.value, 2);
+  var side = sibling.side();
   this.rotateTo(sibling.otherSide());
-  sibling.propagate(sibling.left === null? sibling.right : sibling.left);
+  var newSibling = sibling[side];
+  // if (sibling.left !== null && sibling.right !== null &&
+  //     (RedBlackTree.isRed(sibling.left.left) ||
+  //       RedBlackTree.isRed(sibling.left.right) ) ){
+  //   newSibling = sibling.right;
+  // }
+  // if (sibling.left === null){
+  //   newSibling = sibling.right;
+  // }
+  sibling.propagate(newSibling);
+  // var left = sibling.left === null? 1 : sibling.left.blackDepth();
+  // var right = sibling.right === null? 1 : sibling.right.blackDepth();
+  // sibling.propagate(left < right? sibling.right : sibling.left);
 };
 
-RBtree.prototype.case2 = function(sibling){
-  if (  RBtree.isBlack(sibling.left) &&
-        RBtree.isBlack(sibling.right) ) {
+RedBlackTree.prototype.case2 = function(sibling){
+  treeBreak('case 2 ', sibling.value, 2);
+  if (  RedBlackTree.isBlack(sibling.left) &&
+        RedBlackTree.isBlack(sibling.right) ) {
     //sibling's children are black
     sibling.color = 'red';
     if (this.color === 'red'){
@@ -111,29 +146,35 @@ RBtree.prototype.case2 = function(sibling){
   }
 };
 
-RBtree.prototype.case3 = function(sibling){
+RedBlackTree.prototype.case3 = function(sibling){
+  treeBreak('case 3 ', sibling.value, 2);
   sibling.rotateTo(sibling.side());
   this.case4(sibling);
 };
 
-RBtree.prototype.case4 = function(sibling){
+RedBlackTree.prototype.case4 = function(sibling){
+  treeBreak('case 4 ', sibling.value, 2);
   var side = sibling.side();
   this.rotateTo(sibling.otherSide());
   this[side].color = 'black';
 };
 
 //===========================
-RBtree.prototype.rebalance = function(newTree){
+RedBlackTree.prototype.rebalance = function(newTree){
+  treeBreak('rebalance', this.value, 1);
+  if (!this.getRoot().hasBlackViolation() && !this.getRoot().hasRedViolation()){
+    return;
+  }
   //this is the parent of the new tree node
-  if ( this.sibling() === undefined || RBtree.isBlack(this) ){
+  if ( this.sibling() === undefined || RedBlackTree.isBlack(this) ){
     //sibling is undefined when this has no parent, thus is root
     return;
   }
-  if (RBtree.isRed(this.sibling())){
+  if (RedBlackTree.isRed(this.sibling())){
     if (this.parent !== null){
-      this.parent.repaint();
+      this.parent.repaint(newTree);
     }
-  } else if (RBtree.isBlack(this.sibling())){
+  } else if (RedBlackTree.isBlack(this.sibling())){
     if (this.side() !== null && newTree.side() !== this.side()){
       this.rotateTo(this.side());
     }
@@ -141,7 +182,8 @@ RBtree.prototype.rebalance = function(newTree){
   }
 };
 
-RBtree.prototype.repaint = function(){
+RedBlackTree.prototype.repaint = function(newTree){
+  treeBreak('repaint', this.value, 1);
   this.left.color = 'black';
   this.right.color = 'black';
   this.color = 'red';
@@ -150,11 +192,11 @@ RBtree.prototype.repaint = function(){
     return;
   }
   if (this.parent.color === 'red') {
-    this.parent.parent.repaint();
+    this.parent.rebalance(this); //put back severed links
   }
 };
 
-// RBtree.prototype.rotate = function(d1, d2, blackChildren){
+// RedBlackTree.prototype.reorganize = function(d1, d2, blackChildren){
 //   //rotation occurs when 3 nodes are in a list structure
 //   //they will be grandparent, parent and child
 //   //inside this function, the keyword this is the child
