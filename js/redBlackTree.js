@@ -1,3 +1,4 @@
+/* global BinarySearchTree */
 var RedBlackTree = function(value, parent){
   //console.log('make red black tree ' + value + ' | '+ parent);
   BinarySearchTree.apply(this, arguments);
@@ -83,9 +84,9 @@ RedBlackTree.prototype.removeSelf = function(){
     //removing a red need no changes
     return;
   }
-  treeBreak('removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
+  treeViewer.break('removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
   doubleBlack.propagateUp(doubleBlack.sibling());
-  treeBreak('end removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
+  treeViewer.break('end removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
 };
 
 RedBlackTree.prototype.propagateUp = function(sibling){
@@ -97,7 +98,7 @@ RedBlackTree.prototype.propagateUp = function(sibling){
 RedBlackTree.prototype.propagate = function(sibling){
   //sibling is referring to the sibling of the double black node
   //case 1
-  treeBreak('propagated ' + sibling.value, this.value, 2);
+  treeViewer.break('propagated ' + sibling.value, this.value, 2);
   if (this.color === 'black' && sibling.color === 'red'){
     this.case1(sibling);
   } else if (sibling.color === 'black' && RedBlackTree.isBlack(sibling.left) && RedBlackTree.isBlack(sibling.right)){
@@ -113,7 +114,7 @@ RedBlackTree.prototype.propagate = function(sibling){
 };
 
 RedBlackTree.prototype.case1 = function(sibling){
-  treeBreak('case 1 ', sibling.value, 2);
+  treeViewer.break('case 1 ', sibling.value, 2);
   var side = sibling.side();
   this.rotateTo(sibling.otherSide());
   var newSibling = sibling[side];
@@ -132,7 +133,7 @@ RedBlackTree.prototype.case1 = function(sibling){
 };
 
 RedBlackTree.prototype.case2 = function(sibling){
-  treeBreak('case 2 ', sibling.value, 2);
+  treeViewer.break('case 2 ', sibling.value, 2);
   if (  RedBlackTree.isBlack(sibling.left) &&
         RedBlackTree.isBlack(sibling.right) ) {
     //sibling's children are black
@@ -147,13 +148,13 @@ RedBlackTree.prototype.case2 = function(sibling){
 };
 
 RedBlackTree.prototype.case3 = function(sibling){
-  treeBreak('case 3 ', sibling.value, 2);
+  treeViewer.break('case 3 ', sibling.value, 2);
   sibling.rotateTo(sibling.side());
   this.case4(sibling);
 };
 
 RedBlackTree.prototype.case4 = function(sibling){
-  treeBreak('case 4 ', sibling.value, 2);
+  treeViewer.break('case 4 ', sibling.value, 2);
   var side = sibling.side();
   this.rotateTo(sibling.otherSide());
   this[side].color = 'black';
@@ -161,7 +162,7 @@ RedBlackTree.prototype.case4 = function(sibling){
 
 //===========================
 RedBlackTree.prototype.rebalance = function(newTree){
-  treeBreak('rebalance', this.value, 1);
+  treeViewer.break('rebalance', this.value, 1);
   if (!this.getRoot().hasBlackViolation() && !this.getRoot().hasRedViolation()){
     return;
   }
@@ -183,7 +184,7 @@ RedBlackTree.prototype.rebalance = function(newTree){
 };
 
 RedBlackTree.prototype.repaint = function(newTree){
-  treeBreak('repaint', this.value, 1);
+  treeViewer.break('repaint', this.value, 1);
   this.left.color = 'black';
   this.right.color = 'black';
   this.color = 'red';

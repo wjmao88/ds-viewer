@@ -23,3 +23,15 @@ AsyncQueue.prototype.enqueue = function(func){
     this.next();
   }
 };
+
+var StepQueue = function(){
+  this.queue = [];
+};
+
+StepQueue.prototype.enqueue = function(func){
+  this.queue.push(func);
+};
+
+StepQueue.prototype.next = function(func){
+  this.queue.shift()();
+};

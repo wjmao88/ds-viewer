@@ -85,9 +85,9 @@ BinarySearchTree.prototype.attach = function(value){
     return;
   }
   this[this.whichSide(value)] = this.factory(value, this);
-  treeBreak('attached', value, 1);
+  treeViewer.break('attached', value, 1);
   this.rebalance(this[this.whichSide(value)]);
-  treeBreak('finished rebalancing', value, 1);
+  treeViewer.break('finished rebalancing', value, 1);
 };
 
 BinarySearchTree.prototype.removeSelf = function(root){
@@ -105,7 +105,7 @@ BinarySearchTree.prototype.removeSelf = function(root){
   if (root !== undefined){
     root.rebalance();
   }
-  treeBreak('final node target ', this.value);
+  treeViewer.break('final node target ', this.value);
   return this;
 };
 
@@ -129,7 +129,7 @@ BinarySearchTree.prototype.shiftTo = function(to){
 };
 
 BinarySearchTree.prototype.rotateTo = function(to){
-  treeBreak('begin rotate', this.value, 1);
+  treeViewer.break('begin rotate', this.value, 1);
   //rotating root left of its current position would be from left to right
   var from = this.otherSide(to);
   //swap value of parent and node in the from direction
@@ -147,7 +147,7 @@ BinarySearchTree.prototype.rotateTo = function(to){
   fromSideNode === null? '' : fromSideNode.parent = this;
   this[to][to] = toSideNode;
   toSideNode === null? '' : toSideNode.parent = this[to];
-  treeBreak('end rotate', this.value, 1);
+  treeViewer.break('end rotate', this.value, 1);
 };
 //=========================================================
 //interface methods
@@ -161,13 +161,13 @@ BinarySearchTree.prototype.contains = function(value){
 
 BinarySearchTree.prototype.remove = function(value){
   //value target is the node with the value to be deleted
-  treeBreak('start removing ', value, 2)
+  treeViewer.break('start removing ', value, 2)
   var valueTarget = this.findClosest(value);
   if (valueTarget.value !== value){
     //value is not here
     return;
   }
-  treeBreak('first target ', valueTarget.value, 2);
+  treeViewer.break('first target ', valueTarget.value, 2);
   valueTarget.removeSelf(this);
 };
 
