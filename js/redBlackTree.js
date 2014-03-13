@@ -50,6 +50,7 @@ RedBlackTree.nullCounter = 0;
 RedBlackTree.prototype.toJSON = function(){
   var map = {
     id: '',
+    blackDepth: this.blackDepth(),
     value: this.value,
     color: this.color,
     parent: this.parent === null? null : this.parent.value
@@ -108,9 +109,6 @@ RedBlackTree.prototype.propagate = function(sibling){
     this.case3(sibling);
   } else if (sibling.color === 'black' && RedBlackTree.isRed(sibling[sibling.side()])){
     this.case4(sibling);
-  }
-  if (this.color === 'red'){
-    console.log('unhandled case ', this.value, sibling.value);
   }
 };
 

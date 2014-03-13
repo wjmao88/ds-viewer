@@ -9,22 +9,43 @@
   <script src="js/treeViewer.js"></script>
   <script src="js/app.js"></script>
   <script src="js/test.js"></script>
+
+  <style>
+.entry{
+  display: inline-block;
+  margin: 0 20px;
+}
+input{
+  width: 60px;
+  height: 20px;
+}
+
+  </style>
 </head>
 <body>
-  <div class="entry">
-    <span>Insert: </span>
-    <input type="number" class="input"/>
-    <button class="insert">insert</button>
-    <button class="remove">remove</button>
-    <input type="number" class="iterations"/>
-    <button class="insertRandom">insert random</button>
-  </div>
-  <div class="entry">
-    <button class="autoMode">auto mode</button>
-    <button class="stepMode">step mode</button>
-  </div>
-  <div class="entry">
-    <button class="stepButton">step</button>
+  <div class="title">
+    <div class="entry">
+      <input type="number" class="input"/>
+      <button class="insert">insert</button>
+      <button class="remove">remove</button>
+    </div>
+    <div class="entry">
+      <input type="number" class="iterations"/>
+      <button class="insertRandom">insert random</button>
+      <button class="removeRandom">remove random</button>
+    </div>
+    <div class="entry">
+      <button class="autoMode">auto mode</button>
+      <input type="number" class="delay"/>
+      <button class="changeDelay">set delay</button>
+    </div>
+    <div class="entry">
+      <button class="stepMode">step mode</button>
+      <button class="stepButton">step</button>
+    </div>
+    <div class="entry">
+      <button class="allBlack">all black tree</button>
+    </div>
   </div>
   <svg class="container"></svg>
 </body>

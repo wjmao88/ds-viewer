@@ -1,11 +1,12 @@
 /* global d3, AsyncQueue */
 /* exported treeViewer */
 var treeViewer = {
-  delay: 1000,
   debugMode: false,
   tree: null,
-  focus: null
+  focus: null,
+  delay: 1000
 };
+
 
 treeViewer.ready = function(){
   //setup
@@ -35,7 +36,7 @@ treeViewer.break = function(msg, value, type){
     if (treeViewer.debugMode){
       debugger;
     }
-    console.log(type + ' ' + msg + ' @ ' + value);
+    //console.log(type + ' ' + msg + ' @ ' + value);
     treeViewer.focus = value;
     treeViewer.render(json);
   });
@@ -60,10 +61,15 @@ treeViewer.render = function(treeJSON) {
       return d.value + d.id;
     });
 
+  var captions = treeViewer.svg.selectAll('.captions')
+    .data(layoutNodes, function(d){
+      return d.value + d.id;
+    });
+
   links.exit().remove();
   nodes.exit().remove();
   texts.exit().remove();
-
+  captions.exit().remove();
   //entering
   links
     .enter().append('line')
@@ -81,8 +87,13 @@ treeViewer.render = function(treeJSON) {
     .enter().append('text')
       .attr('fill', 'yellow')
       .attr('class', 'text')
-      .attr('font-size', 30)
-      .text(function(d) { return ('0' + d.value).slice(-2); });
+      .attr('font-size', 30);
+
+  captions
+    .enter().append('text')
+      .attr('fill', 'blue')
+      .attr('class', 'captions')
+      .attr('font-size', 30);
 
   //changing
   links
@@ -114,11 +125,33 @@ treeViewer.render = function(treeJSON) {
 
   texts
     .transition().duration(treeViewer.delay)
+      .text(function(d) {
+        if (d.value === null){
+          return 'Nl';
+        }
+        return ('0' + d.value).slice(-2);
+      })
       .attr('dx', function(d) {
         return d.x-15;
       })
       .attr('dy', function(d) {
         return d.y+10;
+      });
+
+  captions
+    .transition().duration(treeViewer.delay)
+      .text(function(d) {
+        if (d.value === null || d.value === 'nl'){
+          return 1;
+        }
+        console.log(d.value, d.blackDepth);
+        return d.blackDepth;
+      })
+      .attr('dx', function(d) {
+        return d.x-15;
+      })
+      .attr('dy', function(d) {
+        return d.y-30;
       });
 
   nodes

@@ -102,7 +102,7 @@ BinarySearchTree.prototype.removeSelf = function(root){
   treeViewer.break('node to remove ', this.value, 2);
   treeViewer.break('node to remove ', this.value, 2);
   if (this.parent === null){
-    //delete root?
+    this.value = null;
     return this;
   }
   this.parent[this.side()] = null;
@@ -155,7 +155,11 @@ BinarySearchTree.prototype.rotateTo = function(to){
 //=========================================================
 //interface methods
 BinarySearchTree.prototype.insert = function(value){
-  this.findClosest(value).attach(value);
+  if (this.value === null){
+    this.value = value;
+  } else {
+    this.findClosest(value).attach(value);
+  }
 };
 
 BinarySearchTree.prototype.contains = function(value){
@@ -167,10 +171,10 @@ BinarySearchTree.prototype.remove = function(value){
   treeViewer.break('start removing ', value, 2)
   var valueTarget = this.findClosest(value);
   if (valueTarget.value !== value){
-    //value is not here
+    console.log('value is not here');
     return;
   }
-  treeViewer.break('actual removing target', valueTarget.value, 2)
+  treeViewer.break('found removing target', valueTarget.value, 2)
   valueTarget.removeSelf(this);
   treeViewer.break('end of removing', this.value, 2);
   treeViewer.break('end of removing', this.value, 2);
