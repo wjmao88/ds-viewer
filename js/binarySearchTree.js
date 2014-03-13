@@ -85,9 +85,11 @@ BinarySearchTree.prototype.attach = function(value){
     return;
   }
   this[this.whichSide(value)] = this.factory(value, this);
-  treeViewer.break('attached', value, 1);
+  treeViewer.break('node is attached' , value, 1);
+  treeViewer.break('node is attached' , value, 1);
   this.rebalance(this[this.whichSide(value)]);
   treeViewer.break('finished rebalancing', value, 1);
+  treeViewer.break('end of inserting', this.value, 1);
 };
 
 BinarySearchTree.prototype.removeSelf = function(root){
@@ -97,6 +99,8 @@ BinarySearchTree.prototype.removeSelf = function(root){
     this.value = target.value;
     return BinarySearchTree.prototype.removeSelf.call(target, root);
   }
+  treeViewer.break('node to remove ', this.value, 2);
+  treeViewer.break('node to remove ', this.value, 2);
   if (this.parent === null){
     //delete root?
     return this;
@@ -105,7 +109,7 @@ BinarySearchTree.prototype.removeSelf = function(root){
   if (root !== undefined){
     root.rebalance();
   }
-  treeViewer.break('final node target ', this.value);
+  treeViewer.break('node to remove ', this.value, 2);
   return this;
 };
 
@@ -129,7 +133,7 @@ BinarySearchTree.prototype.shiftTo = function(to){
 };
 
 BinarySearchTree.prototype.rotateTo = function(to){
-  treeViewer.break('begin rotate', this.value, 1);
+  treeViewer.break('begin rotate', this.value, 3);
   //rotating root left of its current position would be from left to right
   var from = this.otherSide(to);
   //swap value of parent and node in the from direction
@@ -147,7 +151,6 @@ BinarySearchTree.prototype.rotateTo = function(to){
   fromSideNode === null? '' : fromSideNode.parent = this;
   this[to][to] = toSideNode;
   toSideNode === null? '' : toSideNode.parent = this[to];
-  treeViewer.break('end rotate', this.value, 1);
 };
 //=========================================================
 //interface methods
@@ -167,8 +170,11 @@ BinarySearchTree.prototype.remove = function(value){
     //value is not here
     return;
   }
-  treeViewer.break('first target ', valueTarget.value, 2);
+  treeViewer.break('actual removing target', valueTarget.value, 2)
   valueTarget.removeSelf(this);
+  treeViewer.break('end of removing', this.value, 2);
+  treeViewer.break('end of removing', this.value, 2);
+  treeViewer.break('end of removing', this.value, 2);
 };
 
 //=========================================================

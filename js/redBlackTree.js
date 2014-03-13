@@ -87,6 +87,7 @@ RedBlackTree.prototype.removeSelf = function(){
   treeViewer.break('removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
   doubleBlack.propagateUp(doubleBlack.sibling());
   treeViewer.break('end removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
+  treeViewer.break('end removing ', doubleBlack.parent === null? 'near root' : doubleBlack.parent.value, 2);
 };
 
 RedBlackTree.prototype.propagateUp = function(sibling){
@@ -98,7 +99,7 @@ RedBlackTree.prototype.propagateUp = function(sibling){
 RedBlackTree.prototype.propagate = function(sibling){
   //sibling is referring to the sibling of the double black node
   //case 1
-  treeViewer.break('propagated ' + sibling.value, this.value, 2);
+  treeViewer.break('deciding case type ' + sibling.value, this.value, 1);
   if (this.color === 'black' && sibling.color === 'red'){
     this.case1(sibling);
   } else if (sibling.color === 'black' && RedBlackTree.isBlack(sibling.left) && RedBlackTree.isBlack(sibling.right)){
@@ -114,26 +115,15 @@ RedBlackTree.prototype.propagate = function(sibling){
 };
 
 RedBlackTree.prototype.case1 = function(sibling){
-  treeViewer.break('case 1 ', sibling.value, 2);
+  treeViewer.break('case 1: sibling is red, rotate to double black side', this.value, 2);
   var side = sibling.side();
   this.rotateTo(sibling.otherSide());
   var newSibling = sibling[side];
-  // if (sibling.left !== null && sibling.right !== null &&
-  //     (RedBlackTree.isRed(sibling.left.left) ||
-  //       RedBlackTree.isRed(sibling.left.right) ) ){
-  //   newSibling = sibling.right;
-  // }
-  // if (sibling.left === null){
-  //   newSibling = sibling.right;
-  // }
   sibling.propagate(newSibling);
-  // var left = sibling.left === null? 1 : sibling.left.blackDepth();
-  // var right = sibling.right === null? 1 : sibling.right.blackDepth();
-  // sibling.propagate(left < right? sibling.right : sibling.left);
 };
 
 RedBlackTree.prototype.case2 = function(sibling){
-  treeViewer.break('case 2 ', sibling.value, 2);
+  treeViewer.break('case 2: sibling is black with two black children, color sibling black and propagate up', this.value, 2);
   if (  RedBlackTree.isBlack(sibling.left) &&
         RedBlackTree.isBlack(sibling.right) ) {
     //sibling's children are black
@@ -148,13 +138,13 @@ RedBlackTree.prototype.case2 = function(sibling){
 };
 
 RedBlackTree.prototype.case3 = function(sibling){
-  treeViewer.break('case 3 ', sibling.value, 2);
+  treeViewer.break('case 3: sibling is black with 1 red child, but the red child is on the other side, rotate sibling to reach case 4', this.value, 2);
   sibling.rotateTo(sibling.side());
   this.case4(sibling);
 };
 
 RedBlackTree.prototype.case4 = function(sibling){
-  treeViewer.break('case 4 ', sibling.value, 2);
+  treeViewer.break('case 4: sibling is black with 1 red child, and the red child is on the same side as the sibling. do a rotate to re-arrange local tree', this.value, 2);
   var side = sibling.side();
   this.rotateTo(sibling.otherSide());
   this[side].color = 'black';
@@ -184,7 +174,7 @@ RedBlackTree.prototype.rebalance = function(newTree){
 };
 
 RedBlackTree.prototype.repaint = function(newTree){
-  treeViewer.break('repaint', this.value, 1);
+  treeViewer.break('repainting starting from the value down', this.value, 1);
   this.left.color = 'black';
   this.right.color = 'black';
   this.color = 'red';

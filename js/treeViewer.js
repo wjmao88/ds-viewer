@@ -3,7 +3,8 @@
 var treeViewer = {
   delay: 1000,
   debugMode: false,
-  tree: null
+  tree: null,
+  focus: null
 };
 
 treeViewer.ready = function(){
@@ -35,6 +36,7 @@ treeViewer.break = function(msg, value, type){
       debugger;
     }
     console.log(type + ' ' + msg + ' @ ' + value);
+    treeViewer.focus = value;
     treeViewer.render(json);
   });
 };
@@ -66,13 +68,14 @@ treeViewer.render = function(treeJSON) {
   links
     .enter().append('line')
       .attr('class', 'link')
-      .attr('stroke-width', 2)
       .attr('stroke', 'blue');
 
   nodes
     .enter().append('circle')
       .attr('class', 'node')
-      .attr('r', 20);
+      .attr('r', 20)
+      .attr('stroke-opacity', 0.2)
+      .attr('stroke', 'green');
 
   texts
     .enter().append('text')
@@ -116,5 +119,24 @@ treeViewer.render = function(treeJSON) {
       })
       .attr('dy', function(d) {
         return d.y+10;
+      });
+
+  nodes
+    .transition().duration(treeViewer.delay)
+      .attr('stroke-width', function(d){
+        if (d.value === treeViewer.focus){
+          return 60;
+        } else {
+          return 1.5;
+        }
+      })
+      .attr('fill', function(d){
+        return d.color;
+      })
+      .attr('cx', function(d) {
+        return d.x;
+      })
+      .attr('cy', function(d) {
+        return d.y;
       });
 };
